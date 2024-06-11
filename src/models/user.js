@@ -1,6 +1,5 @@
 import { model, Schema } from "mongoose";
 
-
 const userSchema = new Schema(
   {
     name: {
@@ -8,14 +7,35 @@ const userSchema = new Schema(
       required: true,
       trim: true,
     },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      validate: {
+        validator: function(v) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        },
+        message: props => `${props.value} is not a valid email address!`
+      }
+    },
     phone: {
       type: String,
       required: true,
-      trim: true,
       unique: true,
+      trim: true,
+      validate: {
+        validator: function(v) {
+          return /^[6-9]\d{9}$/.test(v);
+        },
+        message: props => `${props.value} is not a valid 10-digit Indian phone number!`
+      }
     },
     phoneOtp: {
       type: String,
+    },
+    dateOfBirth: {
+      type: Date,
     },
     isAdmin: {
       type: Boolean,

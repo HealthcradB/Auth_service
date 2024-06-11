@@ -65,6 +65,18 @@ const pharmacySchema = new Schema(
       enum: ['pending', 'approved', 'rejected'],
       default: 'pending',
     },
+    imageUpload: {
+      data: Buffer,
+      contentType: {
+        type: String,
+        validate: {
+          validator: function (v) {
+            return /^image\/(jpeg|png)$/.test(v);
+          },
+          message: props => `${props.value} is not a valid image format. Only JPG and PNG are allowed.`
+        },
+      },
+    },
   },
   { timestamps: true }
 );

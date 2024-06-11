@@ -15,7 +15,7 @@ class UserRepository {
             return await User.findById(id);
         } catch (error) {
             throw new Error(`Error finding user by ID: ${error.message}`);
-        }
+        } 
     }
 
     async create(data) {
