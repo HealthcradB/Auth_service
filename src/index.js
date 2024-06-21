@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import {connect} from './config/database.js'
-import apiRoutes from './route/index.js'
+import apiRoutes from './routes/index.js'
 
 const app = express(); 
 

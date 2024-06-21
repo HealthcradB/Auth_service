@@ -2,6 +2,7 @@ import UserService from "../services/user-service.js";
 import PharmacyService from "../services/verifyPharmacy-service.js";
 import UserRepository from "../repository/user-repository.js";
 import jwt from "jsonwebtoken";
+import User from "../models/user.js";
 
 const userService = new UserService();
 const pharmacyService = new PharmacyService();
@@ -14,9 +15,14 @@ export const registerUser = async (req, res, next) => {
 
     const pharmacyData = {
       userId: user._id,
+      phone: user.phone
       // Add other pharmacy details here
     };
     const pharmacy = await pharmacyService.createNewPharmacy(pharmacyData);
+    await User.findByIdAndUpdate(user._id, { $push: { pharmacies: pharmacy._id } });
+
+    console.log(pharmacy);
+
     await userService.sendOTP(user.phone);
     
     console.log("User registered successfully:", user);

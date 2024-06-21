@@ -1,15 +1,23 @@
 import Pharmacy from "../models/verifyPharmacy.js";
 import PharmacyService from "../services/verifyPharmacy-service.js";
+import mongoose from "mongoose";
 
 
 const pharmacyService = new PharmacyService();
-
 export const updatePharmacyDetails = async (req, res, next) => {
   try {
-    const { userId, ...updateData } = req.body;
+    const { id } = req.params;
+    console.log("Received ID:", id);
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid pharmacy ID' });
+    }
+
+    const { ...updateData } = req.body;
 
     // Check if the pharmacy record exists
-    const pharmacy = await Pharmacy.findOne({ userId });
+    const pharmacy = await Pharmacy.findById(id);
+    console.log("Pharmacy found:", pharmacy);
 
     if (!pharmacy) {
       return res.status(404).json({ message: 'Pharmacy details not found' });

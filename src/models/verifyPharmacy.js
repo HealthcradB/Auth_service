@@ -7,6 +7,11 @@ const pharmacySchema = new Schema(
       ref: 'User',
       required: true,
     },
+    phone:{
+      type: String,
+      required: true,
+      trim: true
+    },
     shopName: {
       type: String,
       // required: true,

@@ -9,8 +9,8 @@ class UserService {
   }
 
   async createNewUser(data) {
-    const { phone, name } = data;
-
+    const { phone } = data;
+    
     // Check if phone number already exists
     const phoneExist = await this.userRepository.findOne({ phone });
     if (phoneExist) {
@@ -18,10 +18,7 @@ class UserService {
     }
 
     // Create user without OTP initially
-    const user = await this.userRepository.create({
-      phone,
-      name,
-    });
+    const user = await this.userRepository.create(data);
 
     return user;
   }
