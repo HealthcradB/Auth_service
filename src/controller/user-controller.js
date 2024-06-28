@@ -19,7 +19,7 @@ export const registerUser = async (req, res, next) => {
       // Add other pharmacy details here
     };
     const pharmacy = await pharmacyService.createNewPharmacy(pharmacyData);
-    await User.findByIdAndUpdate(user._id, { $push: { pharmacies: pharmacy._id } });
+    await User.findByIdAndUpdate(user._id, { $push: { pharmacyId: pharmacy._id } });
 
     console.log(pharmacy);
 
@@ -112,18 +112,17 @@ export const fetchCurrentUser = async (req, res, next) => {
 
 export const resendOtp = async (req, res, next) => {
   try {
-      console.log("Received request to resend OTP:", req.body);
-      const { phone } = req.body;
-      const otp = await userService.sendOTP(phone);
-      console.log("OTP resent successfully:", otp);
-      res.status(200).json({
-          type: "success",
-          message: "OTP resent to your registered phone number",
-          data: { otp }
-      });
+    console.log("Received request to login user:", req.body);
+    const user = await userService.loginWithPhoneOtp(req.body.phone);
+    console.log("User logged in successfully:", user);
+    res.status(201).json({
+      type: "success",
+      message: "OTP sent to your registered phone number",
+      data: { userId: user.user._id },
+    });
   } catch (error) {
-      console.error("Error resending OTP:", error);
-      next(error);
+    console.error("Error logging in user:", error);
+    next(error);
   }
 };
 

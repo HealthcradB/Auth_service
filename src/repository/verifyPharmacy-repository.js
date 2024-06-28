@@ -26,6 +26,15 @@ class PharmacyRepository {
     //         throw new Error(`Error updating pharmacy: ${error.message}`);
     //     }
     // }
+    async updatedPharmacybyId(id, data) {
+        try {
+            const updatedPharmacy = await Pharmacy.findByIdAndUpdate(id, data, { new: true });
+            // await updatedPharmacy.save(); // Save the updated document
+            return updatedPharmacy;
+        } catch (error) {
+            throw new Error(`Error updating pharmacy: ${error.message}`);
+        }
+    }
     async updateById(id, data) {
         try {
             const { status = 'pending', ...rest } = data;

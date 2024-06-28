@@ -1,8 +1,11 @@
 import PharmacyRepository from "../repository/verifyPharmacy-repository.js";
+import UserRepository from "../repository/user-repository.js";
+import mongoose from "mongoose";
 
 class PharmacyService {
   constructor() {
     this.pharmacyRepository = new PharmacyRepository();
+    this.userRepository = new UserRepository();
   }
 
   async createNewPharmacy(pharmacyData) {
@@ -13,20 +16,39 @@ class PharmacyService {
     }
   }
   async updatePharmacyDetails(userId, data) {
-    const pharmacy = await this.pharmacyRepository.findById(userId);
-    if (!pharmacy) {
-      throw { status: 404, message: 'Pharmacy details not found' };
+    try {
+      const user = await this.userRepository.findById(userId);
+      
+      if (!user) {
+        throw { status: 404, message: 'User not found' };
+      }
+      
+      const pharmacyId = user.pharmacyId;
+      
+      if (!mongoose.Types.ObjectId.isValid(pharmacyId)) {
+        return { status: 400, message: 'Invalid pharmacy ID' };
+      }
+  
+      const pharmacy = await this.pharmacyRepository.findById(pharmacyId);
+  
+      if (!pharmacy) {
+        throw { status: 404, message: 'Pharmacy details not found' };
+      }
+  
+      const updatedPharmacy = await this.pharmacyRepository.updatedPharmacybyId(pharmacyId, {
+        ...data
+      });
+  
+      return { status: 200, data: updatedPharmacy };
+    } catch (error) {
+      if (error.status) {
+        return { status: error.status, message: error.message };
+      }
+      console.error('Error updating pharmacy details:', error);
+      return { status: 500, message: 'Internal server error' };
     }
-
-    const updatedPharmacy = await this.pharmacyRepository.updateById(userId, data);
-
-    // Set the status to 'pending' indicating that the pharmacy request is pending approval
-    updatedPharmacy.status = 'pending';
-    await updatedPharmacy.save();
-
-    return updatedPharmacy;
-}
-
+  }
+  
 
 async getPharmacyDetails(userId) {
   try {
@@ -42,9 +64,20 @@ async getPharmacyDetails(userId) {
 
 async getAllPendingRequests() {
   try {
-    return await this.pharmacyRepository.findAll({ isApproved: false });
+    const pendingRequests = await this.pharmacyRepository.findAll({ status: 'pending' });
+    console.log(pendingRequests)
+    return pendingRequests;
   } catch (error) {
-    throw error;
+    throw new Error(`Error fetching pending requests: ${error.message}`);
+  }
+}
+
+async getAllApprovedPharmacies() {
+  try {
+    const approvedPharmacy = await this.pharmacyRepository.findAll({ status: 'approved' });
+    return approvedPharmacy;
+  } catch (error) {
+    throw new Error(`Error fetching approved pharmacies: ${error.message}`);
   }
 }
 

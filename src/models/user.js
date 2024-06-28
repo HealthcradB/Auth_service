@@ -64,10 +64,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    pharmacies: [{
+    pharmacyId: {
       type: Schema.Types.ObjectId,
       ref: 'Pharmacy'
-    }],
+    },
     cart: [
       {
         product: {

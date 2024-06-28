@@ -1,22 +1,19 @@
 import Pharmacy from "../models/verifyPharmacy.js";
 import PharmacyService from "../services/verifyPharmacy-service.js";
-import mongoose from "mongoose";
 
 
 const pharmacyService = new PharmacyService();
 export const updatePharmacyDetails = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    console.log("Received ID:", id);
+    const userId = req.user.userId;
+    console.log("Received ID:", userId);
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid pharmacy ID' });
-    }
+    
 
     const { ...updateData } = req.body;
 
     // Check if the pharmacy record exists
-    const pharmacy = await Pharmacy.findById(id);
+    const pharmacy = await pharmacyService.updatePharmacyDetails(userId,updateData)
     console.log("Pharmacy found:", pharmacy);
 
     if (!pharmacy) {
@@ -24,8 +21,7 @@ export const updatePharmacyDetails = async (req, res, next) => {
     }
 
     // Update the pharmacy record with the new details
-    Object.assign(pharmacy, updateData);
-    await pharmacy.save();
+  
 
     console.log("Pharmacy details updated successfully:", pharmacy);
     res.status(200).json({ message: 'Pharmacy details updated successfully', data: pharmacy });
@@ -58,6 +54,7 @@ export const getAllPendingRequests = async (req, res, next) => {
     console.log("Received request to get all pending requests");
     const pendingRequests = await pharmacyService.getAllPendingRequests();
     console.log("Pending requests fetched successfully:", pendingRequests);
+
     res.status(200).json({
       type: "success",
       message: "Fetched all pending requests successfully",
@@ -65,10 +62,34 @@ export const getAllPendingRequests = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error fetching pending requests:", error);
-    next(error);
+    res.status(500).json({
+      type: "error",
+      message: "Error fetching pending requests",
+      error: error.message,
+    });
   }
 };
 
+export const getAllApprovedPharmacies = async (req, res, next) => {
+  try {
+    console.log("Received request to get all approved pharmacies");
+    const approvedPharmacies = await pharmacyService.getAllApprovedPharmacies();
+    console.log("Approved pharmacies fetched successfully:", approvedPharmacies);
+
+    res.status(200).json({
+      type: "success",
+      message: "Fetched all approved pharmacies successfully",
+      data: approvedPharmacies,
+    });
+  } catch (error) {
+    console.error("Error fetching approved pharmacies:", error);
+    res.status(500).json({
+      type: "error",
+      message: "Error fetching approved pharmacies",
+      error: error.message,
+    });
+  }
+};
 export const setPharmacyStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
