@@ -27,6 +27,7 @@ import {
   toggleWishlist,
   getWishlistController
 } from '../../controller/wishlist-controller.js';
+import { addProductToCart, getCart, clearCart, incrementCart, decrementCart } from '../../controller/cart-controller.js';
 
 import checkAdmin from '../../middleware/checkAdmin.js';
 import authenticate from '../../middleware/checkUser.js';
@@ -72,6 +73,11 @@ router.get('/manufacturers/:category', getManufacturersByCategory);
 router.post('/wishlist/toggle', authenticate, toggleWishlist);
 router.get('/wishlist', authenticate, getWishlistController);
 
-
+// Cart routes
+router.post('/add-cart', authenticate, addProductToCart);
+router.get('/cart', authenticate, getCart);
+router.delete('/cart/:itemId', authenticate, clearCart);
+router.patch('/cart/:itemId/increment', authenticate, incrementCart);
+router.patch('/cart/:itemId/decrement', authenticate, decrementCart);
 
 export default router;

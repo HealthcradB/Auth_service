@@ -89,7 +89,6 @@ const userSchema = new Schema(
         type: Number,
         default: 0,
       },
-      ledger: [walletLedgerSchema],
     },
     addresses: [addressSchema]
   },
