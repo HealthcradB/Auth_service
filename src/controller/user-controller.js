@@ -55,7 +55,6 @@ export const loginUser = async (req, res, next) => {
 
 export const loginAdmin = async (req, res) => {
   const { phone } = req.body;
-
   try {
     const user = await userRepository.findByPhone(phone);
     console.log(user.isAdmin)
@@ -137,6 +136,27 @@ export const deleteUserWithPharmacy = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error deleting user:", error);
+    next(error);
+  }
+};
+
+
+export const updateUserDetails = async (req, res, next) => {
+  try {
+    console.log("Received request to update user details:", req.body);
+    const userId = req.user._id; // Assuming userId is in req.user after authentication middleware
+    const updateData = req.body;
+
+    const updatedUser = await userService.updateUserById(userId, updateData);
+
+    console.log("User details updated successfully:", updatedUser);
+    res.status(200).json({
+      type: "success",
+      message: "User details updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating user details:", error);
     next(error);
   }
 };

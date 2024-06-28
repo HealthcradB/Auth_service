@@ -87,6 +87,13 @@ class UserService {
         throw new Error(`Error deleting user: ${error.message}`);
     }
 }
+async updateUserById(id, updateData) {
+  try {
+    return await this.userRepository.updateById(id, updateData);
+  } catch (error) {
+    throw new Error(`Error updating user: ${error.message}`);
+  }
+}
 
 }
 

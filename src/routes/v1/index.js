@@ -7,7 +7,8 @@ import {
   verifyOTP,
   resendOtp,
   deleteUserWithPharmacy,
-  loginAdmin
+  loginAdmin,
+  updateUserDetails
 } from "../../controller/user-controller.js";
 import { updatePharmacyDetails, getPharmacyDetails, getAllPendingRequests, setPharmacyStatus,getAllApprovedPharmacies } from '../../controller/verifyPharmacy-controller.js';
 import checkAdmin from '../../middleware/checkAdmin.js';
@@ -24,6 +25,8 @@ router.get("/me", authenticate, fetchCurrentUser);
 router.post('/resend-otp', resendOtp);
 router.get('/pharmacy-details', authenticate,getPharmacyDetails);
 router.put('/update-pharmacy-details',authenticate,  updatePharmacyDetails);
+router.put('/update-user-info', authenticate, updateUserDetails);
+
 
 // admin route
 router.get('/admin/approved-pharmacy-details', checkAuth,checkAdmin, getAllApprovedPharmacies);

@@ -49,6 +49,13 @@ class UserRepository {
           throw new Error('Error finding user by phone');
         }
       }
+      async updateById(id, updateData) {
+        try {
+            return await User.findByIdAndUpdate(id, updateData, { new: true });
+        } catch (error) {
+            throw new Error(`Error updating user: ${error.message}`);
+        }
+    }
 }
 
 export default UserRepository;
