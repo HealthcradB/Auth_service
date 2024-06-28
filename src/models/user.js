@@ -68,36 +68,30 @@ const userSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Pharmacy'
     },
-    cart: [
+    cartId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Cart',
+    },
+    bookingId: [
       {
-        product: {
-          _id: { type: String, required: true },
-          name: { type: String },
-          banner: { type: String },
-          price: { type: Number },
-        },
-        unit: { type: Number, required: true }
-      }
+        type: Schema.Types.ObjectId,
+        ref: 'Booking', 
+      },
     ],
     wishlist: [
       {
-        _id: { type: String, required: true },
-        name: { type: String },
-        description: { type: String },
-        banner: { type: String },
-        available: { type: Boolean },
-        price: { type: Number },
-      }
+        type: Schema.Types.ObjectId,
+        ref: 'Product',
+      },
     ],
-    orders: [
-      {
-        _id: { type: String, required: true },
-        amount: { type: String },
-        date: { type: Date, default: Date.now }
-      }
-    ],
-    addresses: [addressSchema],
-    
+    wallet: {
+      balance: {
+        type: Number,
+        default: 0,
+      },
+      ledger: [walletLedgerSchema],
+    },
+    addresses: [addressSchema]
   },
   {
     toJSON: {
