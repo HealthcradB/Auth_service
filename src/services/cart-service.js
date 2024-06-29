@@ -46,6 +46,7 @@ class CartService {
                 name: product.NAME,
                 manufacturer: product.MANUFACTURER,
                 mrp: product.MRP,
+                cateogery: product.CATEGORY
             };
 
             const cart = await this.cartRepository.addCartItem(userId, cartItem);

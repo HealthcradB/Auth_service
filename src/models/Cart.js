@@ -9,7 +9,8 @@ const cartItemSchema = new Schema({
   mrp: { type: Number, required: true },
 //   saleRate: { type: Number, required: true },
   finalPurchaseRate: { type: Number, required: true },
-  manufacturer: { type: String, required: true }
+  manufacturer: { type: String, required: true },
+  cateogery :{type: String, required: true}
 });
 
 const cartSchema = new Schema({
