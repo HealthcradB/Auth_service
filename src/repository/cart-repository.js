@@ -34,6 +34,23 @@ class CartRepository {
             throw new Error("Error adding cart item");
         }
     }
+    async removeCartItem(userId, medicineId) {
+        try {
+            let cart = await Cart.findOne({ user: userId });
+            if (cart) {
+                cart.items = cart.items.filter(item => item.medicineId.toString() !== medicineId.toString());
+                cart.totalPrice = this.calculateTotalPrice(cart.items);
+                await cart.save();
+                return cart;
+            } else {
+                throw new Error("Cart not found");
+            }
+        } catch (error) {
+            console.error("Error removing cart item:", error);
+            throw new Error("Error removing cart item");
+        }
+    }
+
 
     calculateTotalPrice(items) {
         return items.reduce((total, item) => total + item.finalPurchaseRate * item.quantity, 0);

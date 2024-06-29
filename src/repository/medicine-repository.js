@@ -1,10 +1,10 @@
-import Medicines from '../models/medicine.js';
+import Medicine from "../models/medicine.js"
 
 
 class MedicineRepository {
   async getMedicine(id) {
     try {
-      const medicine = await Medicines.findById(id);
+      const medicine = await Medicine.findById(id);
       return medicine;
     } catch (error) {
       console.log('Error in getMedicine repository method:', error);
@@ -14,7 +14,7 @@ class MedicineRepository {
 
   async getAllMedicines() {
     try {
-      const medicines = await Medicines.find();
+      const medicines = await Medicine.find();
       return medicines;
     } catch (error) {
       console.log('Error in getAllMedicines repository method:', error);
@@ -24,7 +24,7 @@ class MedicineRepository {
 
   async createMedicine(medicineData) {
     try {
-      const newMedicine = new Medicines(medicineData);
+      const newMedicine = new Medicine(medicineData);
       await newMedicine.save();
       return newMedicine;
     } catch (error) {
@@ -35,7 +35,7 @@ class MedicineRepository {
 
   async deleteMedicine(id) {
     try {
-      const deletedMedicine = await Medicines.findByIdAndDelete(id);
+      const deletedMedicine = await Medicine.findByIdAndDelete(id);
       return deletedMedicine;
     } catch (error) {
       console.log('Error in deleteMedicine repository method:', error);
@@ -45,7 +45,7 @@ class MedicineRepository {
 
   async updateMedicine(id, updatedData) {
     try {
-      const updatedMedicine = await Medicines.findByIdAndUpdate(
+      const updatedMedicine = await Medicine.findByIdAndUpdate(
         id,
         updatedData,
         { new: true }
@@ -59,7 +59,7 @@ class MedicineRepository {
 
   async getMedicinesByManufacturer(manufacturer) {
     try {
-      const medicines = await Medicines.find({ MANUFACTURER: manufacturer });
+      const medicines = await Medicine.find({ MANUFACTURER: manufacturer });
       return medicines;
     } catch (error) {
       console.error(
@@ -72,7 +72,7 @@ class MedicineRepository {
 
   async updateDiscountByManufacturer(manufacturer, discount) {
     try {
-      const result = await Medicines.updateMany(
+      const result = await Medicine.updateMany(
         { MANUFACTURER: manufacturer },
         { $set: { DISCOUNT: discount } }
       );
@@ -87,7 +87,7 @@ class MedicineRepository {
   }
   async insertManyMedicines(medicinesData) {
     try {
-      const result = await Medicines.insertMany(medicinesData);
+      const result = await Medicine.insertMany(medicinesData);
       return result;
     } catch (error) {
       console.error('Error in insertManyMedicines repository method:', error);
@@ -104,7 +104,7 @@ class MedicineRepository {
           { TYPE: { $regex: query, $options: 'i' } },
         ],
       };
-      const result = await Medicines.find(searchQuery);
+      const result = await Medicine.find(searchQuery);
       return result;
     } catch (error) {
       console.error('Error in searchMedicines repository method:', error);
@@ -113,7 +113,7 @@ class MedicineRepository {
   }
   async getManufacturersByCategory(category) {
     try {
-      const manufacturers = await Medicines.distinct('MANUFACTURER', { CATEGORY: category });
+      const manufacturers = await Medicine.distinct('MANUFACTURER', { CATEGORY: category });
       console.log("repo manu",manufacturers)
       return manufacturers;
     } catch (error) {
@@ -124,7 +124,7 @@ class MedicineRepository {
   async updatePriceByMedicine(medicineId, newPrice, discount) {
     try {
       console.log("medicine id in repio",medicineId)
-        const result = await Medicines.updateOne({ _id: medicineId }, {
+        const result = await Medicine.updateOne({ _id: medicineId }, {
             $set: {
                 Final_PURCHASE_RATE: newPrice,
                 DISCOUNT: discount // Ensure discount is stored in the database

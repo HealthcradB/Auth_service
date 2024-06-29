@@ -1,9 +1,9 @@
-import Cuppon from '../models/cuppon.js';
+import Cupon from '../models/coupan.js';
 
 class CuponRepository {
   async createCupon(cuponData) {
     try {
-      const cupon = new Cuppon(cuponData);
+      const cupon = new Cupon(cuponData);
       return await cupon.save();
     } catch (error) {
       throw new Error(`Failed to create cupon: ${error.message}`);
@@ -12,7 +12,7 @@ class CuponRepository {
 
   async findCuponByCode(code) {
     try {
-      return await Cuppon.findOne({ code });
+      return await Cupon.findOne({ code });
     } catch (error) {
       throw new Error(`Failed to find cupon by code: ${error.message}`);
     }
@@ -20,7 +20,7 @@ class CuponRepository {
 
   async updateCupon(code, updateData) {
     try {
-      return await Cuppon.findOneAndUpdate({ code }, updateData, { new: true });
+      return await Cupon.findOneAndUpdate({ code }, updateData, { new: true });
     } catch (error) {
       throw new Error(`Failed to update cupon: ${error.message}`);
     }
@@ -28,14 +28,14 @@ class CuponRepository {
 
   async deleteCupon(code) {
     try {
-      return await Cuppon.findOneAndDelete({ code });
+      return await Cupon.findOneAndDelete({ code });
     } catch (error) {
       throw new Error(`Failed to delete cupon: ${error.message}`);
     }
   }
   async getAllCupons() {
     try {
-      return await Cuppon.find();
+      return await Cupon.find();
     } catch (error) {
       throw new Error(`Failed to get all cupons: ${error.message}`);
     }

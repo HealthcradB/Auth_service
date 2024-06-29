@@ -65,11 +65,28 @@ export const getAllCupons = async (req, res, next) => {
     }
 };
 
-
-
-
-
-
+export const applyCoupon = async (req, res) => {
+    try {
+      const userId = req.user.userId;
+      const { couponCode } = req.body;
+  
+      const updatedOrderSummary = await cuponService.applyCoupon(userId, couponCode);
+      
+      res.status(200).json({
+        type: 'success',
+        message: 'Coupon applied successfully',
+        data: updatedOrderSummary,
+      });
+    } catch (error) {
+      console.error('Error applying coupon:', error);
+      res.status(500).json({
+        type: 'error',
+        message: 'Internal Server Error',
+        error: error.message,
+      });
+    }
+  };
+  
 
 
 

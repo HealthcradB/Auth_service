@@ -1,6 +1,7 @@
 // services/orderService.js
-import CartRepository from '../repositories/cartRepository';
-import OrderRepository from '../repositories/orderRepository';
+import CartRepository from '../repository/cart-repository.js';
+import OrderRepository from '../repository/booking-repository.js';
+import CuponRepository from '../repository/coupan-repository.js';
 
 const calculateCharges = (cartValue) => {
   let convenienceCharge = 0;
@@ -32,20 +33,17 @@ const calculateCharges = (cartValue) => {
   return { convenienceCharge, packagingCharge, deliveryCharge };
 };
 
-const applyCoupon = (total, couponCode) => {
-  const coupons = {
-    'raushan20': 0.20,
-    // Add more coupons here if needed
-  };
 
-  const discount = coupons[couponCode] ? total * coupons[couponCode] : 0;
-  return discount;
-};
 
 class OrderService {
-  async prepareOrderSummary(userId, couponCode) {
+  constructor(){
+     this.cartRepository = new CartRepository();
+     this.orderRepository = new OrderRepository();
+     this.cuponRepository = new CuponRepository();
+  }
+  async prepareOrderSummary(userId,couponCode) {
     try {
-      const cart = await CartRepository.getCartByUserId(userId);
+      const cart = await this.cartRepository.getCartByUserId(userId);
       if (!cart) {
         throw new Error('Cart not found');
       }
@@ -61,23 +59,29 @@ class OrderService {
 
       // Check if any manufacturer has a total less than 5000 rupees for generic medicines
       for (const item of cart.items) {
-        if (item.cateogery === 'generic' && manufacturerTotals[item.manufacturer] < 5000) {
+        if (item.cateogery === 'Generic_Medicine' && manufacturerTotals[item.manufacturer] < 5000) {
           throw new Error(`You need to purchase at least 5000 rupees worth of products from ${item.manufacturer} to include generic medicines.`);
         }
       }
 
       const cartValue = cart.items.reduce((total, item) => total + item.finalPurchaseRate * item.quantity, 0);
       const { convenienceCharge, packagingCharge, deliveryCharge } = calculateCharges(cartValue);
-      const totalBeforeDiscount = cartValue + convenienceCharge + packagingCharge + deliveryCharge;
-      const discount = applyCoupon(totalBeforeDiscount, couponCode);
-      const finalAmount = totalBeforeDiscount - discount;
+      let finalAmount = cartValue + convenienceCharge + packagingCharge + deliveryCharge;
+      // console.log("fahjoilfdh",couponCode.discountPercentage)
 
+      // console.log("fiosdahjofi",couponCode.discountPercentage)
+      let discount = 0;
+      if (couponCode && typeof couponCode.discountPercentage === 'number') {
+        discount = (couponCode.discountPercentage / 100) * finalAmount;
+        finalAmount = finalAmount - discount;
+      }
+   
       const orderSummary = {
         cartValue,
         convenienceCharge,
         packagingCharge,
         deliveryCharge,
-        discount,
+        discount : 0,
         finalAmount,
       };
 
@@ -88,31 +92,33 @@ class OrderService {
     }
   }
 
-  async createOrder(userId, address, paymentOption, couponCode) {
+  async createOrder(userId, address, paymentOption,couponCode) {
     try {
-      const orderSummary = await this.prepareOrderSummary(userId, couponCode);
-
-      const cart = await CartRepository.getCartByUserId(userId);
+      
+      const coupon = await this.cuponRepository.findCuponByCode(couponCode);  
+      const orderSummary = await this.prepareOrderSummary(userId,coupon);
+      const cart = await this.cartRepository.getCartByUserId(userId);
 
       const orderData = {
         user: userId,
         address,
+        
         products: cart.items,
         paymentStatus: paymentOption === 'full' ? 'paid' : 'pending',
-        totalPrice: orderSummary.finalAmount,
+        couponCode,
+        totalPrice: orderSummary.cartValue,
         convenienceCharge: orderSummary.convenienceCharge,
         packagingCharge: orderSummary.packagingCharge,
         deliveryCharge: orderSummary.deliveryCharge,
-        couponCode,
         discount: orderSummary.discount,
         finalAmount: orderSummary.finalAmount,
         status: 'pending',
         trackingHistory: [{ status: 'pending', date: new Date() }],
       };
 
-      const order = await OrderRepository.createOrder(orderData);
+      const order = await this.orderRepository.createOrder(orderData);
 
-      await CartRepository.clearCart(userId);
+      await this.cartRepository.clearCart(userId);
 
       return order;
     } catch (error) {
@@ -123,7 +129,7 @@ class OrderService {
 
   async updateOrderStatus(orderId, status) {
     try {
-      const order = await OrderRepository.updateOrderStatus(orderId, status);
+      const order = await this.orderRepository.updateOrderStatus(orderId, status);
       return order;
     } catch (error) {
       console.error('Error updating order status:', error);
@@ -133,13 +139,16 @@ class OrderService {
 
   async getOrderById(orderId) {
     try {
-      const order = await OrderRepository.getOrderById(orderId);
+      const order = await this.orderRepository.getOrderById(orderId);
       return order;
     } catch (error) {
       console.error('Error fetching order:', error);
       throw new Error('Error fetching order');
     }
   }
+ 
 }
 
-export default new OrderService();
+
+
+export default OrderService;

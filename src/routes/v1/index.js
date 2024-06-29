@@ -27,7 +27,9 @@ import {
   toggleWishlist,
   getWishlistController
 } from '../../controller/wishlist-controller.js';
-import { addProductToCart, getCart, clearCart, incrementCart, decrementCart } from '../../controller/cart-controller.js';
+import { addProductToCart, removeCartItem,getCart, clearCart, incrementCart, decrementCart } from '../../controller/cart-controller.js';
+import { createCupon, deleteCupon, getAllCupons, applyCoupon } from '../../controller/coupan-controller.js';
+import { getOrderSummary, createOrder, updateOrderStatus, getOrder } from '../../controller/booking-controller.js';
 
 import checkAdmin from '../../middleware/checkAdmin.js';
 import authenticate from '../../middleware/checkUser.js';
@@ -75,10 +77,25 @@ router.get('/wishlist', authenticate, getWishlistController);
 
 // Cart routes
 router.post('/add-cart', authenticate, addProductToCart);
+router.patch('/remove-cartitem/:medicineId',authenticate,removeCartItem);
 router.get('/cart', authenticate, getCart);
 router.delete('/cart/:itemId', authenticate, clearCart);
 router.patch('/cart/:itemId/increment', authenticate, incrementCart);
 router.patch('/cart/:itemId/decrement', authenticate, decrementCart);
+
+//Order-summary
+
+router.post('/get-order-summary',authenticate, getOrderSummary);
+router.post('/create-order',authenticate, createOrder);
+router.put('/:orderId/status',authenticate, updateOrderStatus);
+router.get('/get-order/:orderId',authenticate, getOrder);
+
+
+//cuppon router
+router.post('/create-cuppn',authenticate, createCupon);
+router.delete('/cuppon-delete/:code',authenticate, deleteCupon);
+router.get('/getall-cuppon',authenticate, getAllCupons);
+router.post('/apply-cuppon',authenticate, applyCoupon);
 
 
 

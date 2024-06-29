@@ -24,7 +24,26 @@ export const addProductToCart = async (req, res, next) => {
         });
     }
 };
-
+export const removeCartItem = async (req, res) => {
+    try {
+      const userId = req.user.userId; // Assuming user ID is available in req.user
+      console.log("userid in controller",userId)
+      const { medicineId } = req.params; // Assuming medicineId is passed as a parameter
+      const cart = await cartService.removeCartItem(userId, medicineId);
+  
+      res.status(200).json({
+        success: true,
+        message: 'Cart item removed successfully',
+        cart,
+      });
+    } catch (error) {
+      console.error('Error removing cart item:', error);
+      res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
 export const getCart = async (req, res, next) => {
     try {
         const userId = req.user.userId; // Assuming user ID is available in req.user

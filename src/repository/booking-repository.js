@@ -1,5 +1,5 @@
 // repositories/orderRepository.js
-import Order from '../models/order';
+import Order from '../models/booking.js';
 
 class OrderRepository {
   async createOrder(orderData) {
@@ -42,4 +42,4 @@ class OrderRepository {
   }
 }
 
-export default new OrderRepository();
+export default  OrderRepository;

@@ -68,6 +68,15 @@ class CartService {
             throw new Error("Error fetching cart");
         }
     }
+    async removeCartItem(userId, medicineId){
+        try {
+            const cart = await this.cartRepository.removeCartItem(userId,medicineId)
+            return cart
+        } catch (error) {
+            console.log("Error removing item from cart:", error);
+            throw new Error("Error fetching cart");
+        }
+    }
 }
 
 export default CartService;

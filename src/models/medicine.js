@@ -44,7 +44,7 @@ const medicineSchema = new mongoose.Schema(
     },
     CATEGORY: {
       type: String,
-      // enum: ['Generic_Medicine', 'Big_Brand_Medicine'],
+      enum: ['Generic_Medicine', 'Big_Brand_Medicine'],
       required: true,
     },
   },
@@ -53,6 +53,6 @@ const medicineSchema = new mongoose.Schema(
   }
 );
 
-const Medicine = mongoose.model('Product', medicineSchema);
+const Medicine = mongoose.model('Medicine', medicineSchema);
 
 export default Medicine;

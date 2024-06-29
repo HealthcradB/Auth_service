@@ -1,12 +1,14 @@
-import CuponRepository from '../repository/cuppon-repository.js';
+import CuponRepository from '../repository/coupan-repository.js';
 import UserRepository from '../repository/user-repository.js';
 import CartRepository from '../repository/cart-repository.js';
+import OrderService from './booking-service.js';
 
 class CuponService {
   constructor() {
     this.cuponRepository = new CuponRepository();
     this.userRepository = new UserRepository();
     this.cartRepository = new CartRepository();
+    this.orderService = new OrderService();
   }
 
   async createCupon(cuponData) {
@@ -16,7 +18,40 @@ class CuponService {
       throw new Error(`Failed to create cupon: ${error.message}`);
     }
   }
+  async applyCoupon(userId, couponCode) {
+    try {
+      // Fetch the coupon details
+      const coupon = await this.cuponRepository.findCuponByCode(couponCode);
+      // console.log(coupon)
 
+      if (!coupon) {
+        throw new Error('Invalid coupon code');
+      }
+
+      // Check if the coupon is expired
+      const currentDate = new Date();
+      if (coupon.expiryDate < currentDate) {
+        throw new Error('Coupon is expired');
+      }
+
+      // Get the user's current order summary
+      const orderSummary = await this.orderService.prepareOrderSummary(userId,coupon);
+
+      // Calculate the discount
+      // const discount = (coupon.discountPercentage / 100) * orderSummary.finalAmount;
+      // const finalAmount = orderSummary.finalAmount - discount;
+
+      // Update the order summary with the discount
+      const updatedOrderSummary = {
+        ...orderSummary
+      };
+
+      return updatedOrderSummary;
+    } catch (error) {
+      console.error('Error applying coupon:', error);
+      throw new Error('Error applying coupon');
+    }
+  }
  
 
   async deleteCupon(code) {
@@ -36,45 +71,3 @@ class CuponService {
 }
 
 export default  CuponService;
-// async applyCoupon(userId, code) {
-//     try {
-//         // Get the user's cart
-//         const cart = await this.cartRepository.getCartByUserId(userId);
-//         if (!cart) {
-//             throw new Error('Cart not found');
-//         }
-
-//         // Calculate the total price of the cart
-//         const totalAmount = cart.items.reduce((total, item) => {
-//             return total + (item.price * item.quantity);
-//         }, 0);
-
-//         // Apply the coupon
-//         const cupon = await this.cuponRepository.findCuponByCode(code);
-//         if (!cupon || !cupon.isActive || cupon.expiryDate < new Date()) {
-//             throw new Error('Invalid or expired coupon');
-//         }
-
-//         if (cupon.usedBy.includes(userId)) {
-//             throw new Error('Coupon already used by this user');
-//         }
-
-//         const discountAmount = (totalAmount * cupon.discountPercentage) / 100;
-//         const finalAmount = totalAmount - discountAmount;
-
-//         // Mark the coupon as used by this user
-//         cupon.usedBy.push(userId);
-//         if (cupon.usedBy.length >= 1) {
-//             cupon.isActive = false;
-//         }
-//         await cupon.save();
-
-//         // Update the cart's total price
-//         cart.totalPrice = finalAmount;
-//         await cart.save();
-
-//         return finalAmount;
-//     } catch (error) {
-//         throw new Error(`Failed to apply coupon: ${error.message}`);
-//     }
-// }
